@@ -96,7 +96,7 @@ class HardwareSerial : public Stream
     uint8_t _rxpin;
     int8_t _serial_channel;
     volatile bool _sending;
-    volatile bool _begin;
+    volatile bool _begin = false;
 #endif/*__RX600__*/
 
 #if SERIAL_BUFFER_SIZE < 256
@@ -132,8 +132,12 @@ class HardwareSerial : public Stream
      virtual ~HardwareSerial(){};// added to remove warning in __RX600__
 #endif/*__RX600__*/
     void begin(unsigned long baud) { begin(baud, SERIAL_8N1); }
-    void begin(unsigned long, uint8_t);
-    void end();
+#ifndef __RX600__
+	void begin(unsigned long, uint8_t);
+#else /*__RX600__*/
+	bool begin(unsigned long, uint8_t);
+#endif/*__RX600__*/
+	void end();
     virtual int available(void);
     virtual int peek(void);
     virtual int read(void);
@@ -156,6 +160,12 @@ class HardwareSerial : public Stream
     bool _buffer_available();
 #endif/*__RX600__*/
     void _tx_udr_empty_irq(void);
+
+#ifdef __RX600__
+    // Special terminal signals
+    bool isBreakState(void);
+    bool clearBreakState(void);
+#endif/*__RX600__*/
 };
 
 #ifndef __RX600__

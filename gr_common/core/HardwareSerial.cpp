@@ -192,8 +192,11 @@ void HardwareSerial::_tx_udr_empty_irq(void)
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
-
+#ifndef __RX600__
 void HardwareSerial::begin(unsigned long baud, byte config)
+#else /*__RX600__*/
+bool HardwareSerial::begin(unsigned long baud, byte config)
+#endif/*__RX600__*/
 {
 #ifndef __RX600__
   // Try u2x mode first
@@ -416,6 +419,7 @@ void HardwareSerial::begin(unsigned long baud, byte config)
   default:
     break;
   }
+  return _begin;
 #endif/*__RX600__*/
 }
 
@@ -764,6 +768,16 @@ void WriteBulkINPacket(void)
 }
 
 } // extern C
+
+bool HardwareSerial::isBreakState(void)
+{
+  return USBCDC_IsBreakState();
+}
+
+bool HardwareSerial::clearBreakState(void)
+{
+  return USBCDC_Clear_BreakState();
+}
 
 HardwareSerial Serial(0, NULL, MstpIdINVALID, INVALID_IO, INVALID_IO);
 #endif/*HAVE_HWSERIAL0*/
